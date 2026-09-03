@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from psycopg import Connection
-from psycopg.errors import ForeignKeyViolation, UniqueViolation
+from psycopg.errors import ForeignKeyViolation, RestrictViolation, UniqueViolation
 
 
 class FloorRepository:
@@ -75,6 +75,9 @@ class FloorRepository:
             raise ValueError("duplicate code") from exc
 
     def delete(self, floor_id: UUID) -> bool:
-        with self._conn.cursor() as cur:
-            cur.execute("DELETE FROM floors WHERE id = %s", (floor_id,))
-            return cur.rowcount > 0
+        try:
+            with self._conn.cursor() as cur:
+                cur.execute("DELETE FROM floors WHERE id = %s", (floor_id,))
+                return cur.rowcount > 0
+        except RestrictViolation as exc:
+            raise ValueError("has dependent records") from exc

@@ -54,5 +54,7 @@ def update_portfolio(portfolio_id: UUID, body: PortfolioUpdate, service: Portfol
 def delete_portfolio(portfolio_id: UUID, service: PortfolioService = Depends(_service)):
     try:
         service.delete(portfolio_id)
+    except ValidationError as exc:
+        handle_validation(exc)
     except NotFoundError as exc:
         handle_not_found(exc)

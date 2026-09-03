@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from psycopg import Connection
-from psycopg.errors import UniqueViolation
+from psycopg.errors import RestrictViolation, UniqueViolation
 
 
 class PortfolioRepository:
@@ -63,6 +63,9 @@ class PortfolioRepository:
             raise ValueError("duplicate code") from exc
 
     def delete(self, portfolio_id: UUID) -> bool:
-        with self._conn.cursor() as cur:
-            cur.execute("DELETE FROM portfolios WHERE id = %s", (portfolio_id,))
-            return cur.rowcount > 0
+        try:
+            with self._conn.cursor() as cur:
+                cur.execute("DELETE FROM portfolios WHERE id = %s", (portfolio_id,))
+                return cur.rowcount > 0
+        except RestrictViolation as exc:
+            raise ValueError("has dependent records") from exc

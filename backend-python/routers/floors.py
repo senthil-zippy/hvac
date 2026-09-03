@@ -58,5 +58,7 @@ def update_floor(floor_id: UUID, body: FloorUpdate, service: FloorService = Depe
 def delete_floor(floor_id: UUID, service: FloorService = Depends(_service)):
     try:
         service.delete(floor_id)
+    except ValidationError as exc:
+        handle_validation(exc)
     except NotFoundError as exc:
         handle_not_found(exc)

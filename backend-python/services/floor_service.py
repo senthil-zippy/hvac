@@ -43,5 +43,9 @@ class FloorService:
         return row
 
     def delete(self, floor_id: UUID) -> None:
-        if not self._repo.delete(floor_id):
+        try:
+            deleted = self._repo.delete(floor_id)
+        except ValueError:
+            raise field_error("id", "has dependent records and cannot be deleted") from None
+        if not deleted:
             raise NotFoundError()

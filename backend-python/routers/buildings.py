@@ -58,5 +58,7 @@ def update_building(building_id: UUID, body: BuildingUpdate, service: BuildingSe
 def delete_building(building_id: UUID, service: BuildingService = Depends(_service)):
     try:
         service.delete(building_id)
+    except ValidationError as exc:
+        handle_validation(exc)
     except NotFoundError as exc:
         handle_not_found(exc)

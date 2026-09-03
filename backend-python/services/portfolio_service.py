@@ -41,5 +41,9 @@ class PortfolioService:
         return row
 
     def delete(self, portfolio_id: UUID) -> None:
-        if not self._repo.delete(portfolio_id):
+        try:
+            deleted = self._repo.delete(portfolio_id)
+        except ValueError:
+            raise field_error("id", "has dependent records and cannot be deleted") from None
+        if not deleted:
             raise NotFoundError()

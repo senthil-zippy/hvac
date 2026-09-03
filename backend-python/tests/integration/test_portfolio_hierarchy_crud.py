@@ -8,7 +8,7 @@ def test_full_chain_create_and_get(client, portfolio, building, floor, zone):
 
 
 def test_paginated_list(client, portfolio):
-    resp = client.get("/api/portfolios", params={"limit": 5, "offset": 0})
+    resp = client.get("/api/portfolios", params={"limit": 200, "offset": 0})
     assert resp.status_code == 200
     body = resp.json()
     assert "items" in body and "total" in body and "limit" in body and "offset" in body
